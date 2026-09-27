@@ -1,0 +1,32 @@
+digraph pipeline {
+  graph [rankdir=TB, bgcolor="white", pad="0.25", nodesep="0.35", ranksep="0.45", fontname="DejaVu Sans"];
+  node [shape=box, style="rounded,filled", fillcolor="#F4F6F8", color="#CFD8E3", fontname="DejaVu Sans", fontsize=12, margin="0.18,0.12"];
+  edge [color="#64748B", arrowsize=0.7, fontname="DejaVu Sans", fontsize=10];
+  input [label="Запрос, фильтры и каталог", fillcolor="#E9F0FA", color="#8AAAD2"];
+  stats [label="Статистика обучающих пар\nГеография и вероятность категории"];
+  lexical [label="BM25 со стеммингом\nСимвольный поиск по заголовкам"];
+  semantic [label="multilingual-e5-small\nПоиск по эмбеддингам"];
+  candidates [label="Объединение кандидатов\nбез повторов", fillcolor="#E9F0FA", color="#8AAAD2"];
+  features [label="57 признаков\nТекст, ранги, география, рейтинг, фильтры"];
+  search [label="Ранги поиска с поправками\nна географию и категорию"];
+  ranker [label="CatBoost PairLogit"];
+  blend [label="Смешивание рангов через RRF", fillcolor="#E7F3EC", color="#83B396"];
+  output [label="50 объявлений на запрос\nanswer.csv", fillcolor="#E7F3EC", color="#83B396"];
+  input -> lexical;
+  input -> semantic;
+  stats -> lexical [label="география", style=dashed];
+  stats -> semantic [label="география", style=dashed];
+  lexical -> candidates;
+  semantic -> candidates;
+  candidates -> features;
+  candidates -> search;
+  stats -> features [style=dashed];
+  stats -> search [style=dashed];
+  features -> ranker;
+  ranker -> blend;
+  search -> blend;
+  blend -> output;
+  {rank=same; input; stats;}
+  {rank=same; lexical; semantic;}
+  {rank=same; features; search;}
+}

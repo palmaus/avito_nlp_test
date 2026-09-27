@@ -1,0 +1,11 @@
+data/*
+!data/train.parquet
+!data/benchmark_items.parquet
+!data/benchmark_queries.parquet
+cache/
+answer.csv
+.venv/
+__pycache__/
+.ipynb_checkpoints/
+.ruff_cache/
+*.pyc
